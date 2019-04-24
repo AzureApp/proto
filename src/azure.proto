@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+// we don't need reflection for our use cases
+option optimize_for = LITE_RUNTIME;
+
+package azure.proto;
+
+service Azure {
+    rpc Connect 
+}

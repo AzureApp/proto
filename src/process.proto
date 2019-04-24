@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+// we don't need reflection for our use cases
+option optimize_for = LITE_RUNTIME;
+
+package azure.proto;
+
+/**
+ * flag indicating the type of a process, can have more than one. 
+ */
+enum ProcessType {
+    PROC_SYSTEM = 1; // system processes like daemons
+    PROC_BACKGROUND = 2; // background user processes
+    PROC_APP = 4; // what an average user would call an "app"
+}
+
+
+// TODO: maybe use a oneof for Process or AppProcess which contains more info exclusive to apps
+message Process {
+    int32 pid = 1;
+    string name = 2;
+    string path = 3;
+    int32 process_flags = 4; // use the ProcessType enum with this flag
+
+    bytes additional_info = 10; // this info can be used to encode data such as app icons if supported by the server
+}
+
+message ProcessRequest {
+    oneof parameters {
+        int32 process_flags = 1;
+        int32 pid = 2;
+        string name = 3;
+    }
+}
+
+message KillRequest {
+    int32 pid = 1;
+    int32 signal = 2;
+}
+
+service ProcessService {
+    rpc GetProcess (ProcessRequest) returns (Process); // finds the first available process that matches the request parameters
+    rpc FindProcesses (ProcessRequest) returns (stream Process); // returns a stream of all processes that match the request parameters
+}

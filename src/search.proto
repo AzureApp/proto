@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+// we don't need reflection for our use cases
+option optimize_for = LITE_RUNTIME;
+
+package azure.proto;
+
+enum MemoryFlags {
+  PROT_NONE = 0;
+  PROT_READ = 1;
+  PROT_WRITE = 2;
+  PROT_EXEC = 4;
+}
+
+enum MemoryZones {
+  ZONE_ALL = 0;
+  ZONE_DATA = 1;
+  ZONE_STACK = 2;
+  ZONE_HEAP = 4;
+}
+
+message SearchOptions {
+  int32 target_pid = 1;
+  int32 memory_flags = 2;
+  int32 zone_flags = 3;
+  int32 max_results = 4; // by default this should be -1 for "unlimited"
+}
+
+// TODO: these messages may be redundant and instead we could just use a byte
+// array and a flag indicating the type of search
+
+message Int32SearchRequest { int32 value = 1; }
+
+message Int64SearchRequest { int64 value = 1; }
+
+message FloatSearchRequest { float value = 1; }
+
+message DoubleSearchRequest { double value = 1; }
+
+message StringSearchRequest { string value = 1; }
+
+message ByteSearchRequest { bytes value = 1; }
+
+message SearchResult {
+  // TODO
+}
+
+// TODO: define fuzzy searches too
+
+message SearchRequest {
+  SearchOptions options = 1;
+  oneof request {
+    Int32SearchRequest int32_request = 1;
+    Int64SearchRequest int64_request = 2;
+    FloatSearchRequest float_request = 3;
+    DoubleSearchRequest double_request = 4;
+    StringSearchRequest string_request = 5;
+    ByteSearchRequest byte_request = 6;
+  }
+
+  // if this variable is null a new search is performed, otherwise the
+  // search will only search at addresses defined in the results list
+  repeated SearchResult results = 2;
+}
+
+service SearchService {
+  /**
+   * Performs a new search on target pid.
+   * This rpc fails if the target pid no longer exists
+   */
+  rpc NewSearch(SearchRequest) returns (stream SearchResult);
+  /**
+   * Performs a continuation of a previous search on target pid.
+   * This rpc fails if the target pid no longer exists or if the "results" field
+   * of the search request is null as this variable contains the previous search
+   * locations to iterate over
+   */
+  rpc ContinueSearch(SearchRequest) returns (stream SearchResult);
+  /**
+   * Updates the values of the provided result object stream with the current
+   * values of the memory locations stored in the result objects. This rpc fails
+   * if the target pid is null or if any of the results now points to
+   * inaccesible/invalid memory
+   */
+  rpc UpdateResults(stream SearchResult) returns (stream SearchResult);
+}

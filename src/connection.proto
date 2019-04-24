@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+// we don't need reflection for our use cases
+option optimize_for = LITE_RUNTIME;
+
+package azure.proto;
+
+/**
+ * Contains information about a device, including it's operating system, device
+ * name etc.
+ */
+message DeviceInfo {
+  enum OperatingSystem {
+    OS_WINDOWS = 0;
+    OS_LINUX = 1;
+    OS_MACOS = 2;
+    OS_IOS = 3;
+    OS_ANDROID = 4;
+  }
+
+  OperatingSystem operating_system = 1;
+  string os_version = 2;
+  string device_name = 3;
+  string udid = 4;
+}
+
+/**
+ * Message sent and received on a new connection.
+ * Contains information about the sender such as device onfo and azure version.
+ */
+message Handshake {
+  string azure_version = 1;
+  DeviceInfo device_info = 2;
+}
+
+/**
+ * Message sent to poll latency between clients for testing quality of
+ * connection
+ */
+message Keepalive { int64 timestap = 1; }
+
+service ConnectionService {
+  /**
+   * sends a handshake message on new connection to client, who sends one back
+   * if client is on an incompatible version of azure, this rpc will return an
+   * error instead
+   */
+  rpc Connect(Handshake) returns (Handshake);
+}
