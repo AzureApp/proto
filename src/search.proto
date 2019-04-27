@@ -19,12 +19,21 @@ enum MemoryZones {
   ZONE_HEAP = 4;
 }
 
+/**
+ * Options used for search requests
+ */
 message SearchOptions {
-  int32 target_pid = 1;
-  int32 memory_flags = 2;
-  int32 zone_flags = 3;
-  int32 max_results = 4; // by default this should be -1 for "unlimited"
+  int32 target_pid = 1;   // target process
+  bool fuzzy = 2;         // search is fuzzy
+  int32 memory_flags = 3; // what protections to include
+  int32 zone_flags = 4;   // which memory regions to search
+  int32 max_results = 5;  // max results. by default this is -1 for "unlimited"
+  int32 alignment = 6;    // search alignment. should default to 4 bytes
 }
+
+/**
+ * Search request definitions
+ */
 
 // TODO: these messages may be redundant and instead we could just use a byte
 // array and a flag indicating the type of search
@@ -41,21 +50,81 @@ message StringSearchRequest { string value = 1; }
 
 message ByteSearchRequest { bytes value = 1; }
 
-message SearchResult {
-  // TODO
+/**
+ * Fuzzy search definitions
+ **************************
+ * if lower_bound is undefined, assume fuzzy search for <= upper bound
+ * if upper_bound is undefined, assume fuzzy search for >= lower_bound
+ * if both are undefined, assume fuzzy search for all locations
+ * if neither are undefined, assume fuzzy search for lower <= n <= upper
+ */
+
+message Int32FuzzyRequest {
+  int32 lower_bound = 1;
+  int32 upper_bound = 2;
 }
 
-// TODO: define fuzzy searches too
+message Int64FuzzyRequest {
+  int64 lower_bound = 1;
+  int64 upper_bound = 2;
+}
 
+message FloatFuzzyRequest {
+  float lower_bound = 1;
+  float upper_bound = 2;
+}
+
+message DoubleFuzzyRequest {
+  double lower_bound = 1;
+  double upper_bound = 2;
+}
+
+enum ResultType {
+  RESULT_TYPE_INT32 = 0;
+  RESULT_TYPE_INT64 = 1;
+  RESULT_TYPE_FLOAT = 2;
+  RESULT_TYPE_DOUBLE = 3;
+  RESULT_TYPE_STRING = 4;
+  RESULT_TYPE_BYTES = 5;
+}
+
+/**
+ * Contains data for one search result.
+ * Data includes the address of the result, the type of the result data and the
+ * data itself.
+ */
+message SearchResult {
+  int64 address = 1;
+  ResultType result_type = 2;
+  oneof result {
+    int32 result_int32 = 1;
+    int64 result_int64 = 2;
+    float result_float = 3;
+    double result_double = 4;
+    string result_string = 5;
+    bytes result_bytes = 6;
+  }
+}
+
+/**
+ * Defines the data required for a new search operation.
+ * This includes the search options andthe data-type specific search info.
+ * An optional "results" array of search results is provided for continuations
+ * of an existing search.
+ */
 message SearchRequest {
   SearchOptions options = 1;
   oneof request {
-    Int32SearchRequest int32_request = 1;
-    Int64SearchRequest int64_request = 2;
-    FloatSearchRequest float_request = 3;
-    DoubleSearchRequest double_request = 4;
-    StringSearchRequest string_request = 5;
-    ByteSearchRequest byte_request = 6;
+    Int32SearchRequest request_int32 = 1;
+    Int64SearchRequest request_int64 = 2;
+    FloatSearchRequest request_float = 3;
+    DoubleSearchRequest request_double = 4;
+    StringSearchRequest request_string = 5;
+    ByteSearchRequest request_bytes = 6;
+    Int32FuzzyRequest fuzzy_int32 = 7;
+    Int64FuzzyRequest fuzzy_int64 = 8;
+    FloatFuzzyRequest fuzzy_float = 9;
+    DoubleFuzzyRequest fuzzy_double = 10;
   }
 
   // if this variable is null a new search is performed, otherwise the
@@ -73,14 +142,14 @@ service SearchService {
    * Performs a continuation of a previous search on target pid.
    * This rpc fails if the target pid no longer exists or if the "results" field
    * of the search request is null as this variable contains the previous search
-   * locations to iterate over
+   * locations to iterate over.
    */
   rpc ContinueSearch(SearchRequest) returns (stream SearchResult);
   /**
    * Updates the values of the provided result object stream with the current
-   * values of the memory locations stored in the result objects. This rpc fails
-   * if the target pid is null or if any of the results now points to
-   * inaccesible/invalid memory
+   * values of the memory locations stored in the result objects.
+   * This rpc fails if the target pid is null or if any of the results now
+   * points to inaccesible/invalid memory.
    */
   rpc UpdateResults(stream SearchResult) returns (stream SearchResult);
 }
