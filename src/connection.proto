@@ -3,6 +3,8 @@ syntax = "proto3";
 // we don't need reflection for our use cases
 option optimize_for = LITE_RUNTIME;
 
+import "google/protobuf/empty.proto";
+
 package azure.proto;
 
 /**
@@ -39,11 +41,27 @@ message Handshake {
  */
 message Keepalive { int64 timestap = 1; }
 
+enum DisconnectOperation {
+  OP_NONE = 0;
+  OP_RESTART = 1; // restart server
+  OP_KILL = 2;    // kill server
+}
+
+message Disconnet {
+  string reason = 1;
+  DisconnectOperation operation = 2;
+}
+
 service ConnectionService {
   /**
-   * sends a handshake message on new connection to client, who sends one back
+   * Sends a handshake message on new connection to client, who sends one back
    * if client is on an incompatible version of azure, this rpc will return an
    * error instead
    */
   rpc Connect(Handshake) returns (Handshake);
+  /**
+   * Disconnect from connected server.
+   * This rpc should not return if a kill/restart operation is also provided
+   */
+  rpc Disconnect(Disconnect) returns (google.protobuf.Empty);
 }
