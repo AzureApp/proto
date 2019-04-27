@@ -97,12 +97,12 @@ message SearchResult {
   int64 address = 1;
   ResultType result_type = 2;
   oneof result {
-    int32 result_int32 = 1;
-    int64 result_int64 = 2;
-    float result_float = 3;
-    double result_double = 4;
-    string result_string = 5;
-    bytes result_bytes = 6;
+    int32 result_int32 = 3;
+    int64 result_int64 = 4;
+    float result_float = 5;
+    double result_double = 6;
+    string result_string = 7;
+    bytes result_bytes = 8;
   }
 }
 
@@ -115,21 +115,21 @@ message SearchResult {
 message SearchRequest {
   SearchOptions options = 1;
   oneof request {
-    Int32SearchRequest request_int32 = 1;
-    Int64SearchRequest request_int64 = 2;
-    FloatSearchRequest request_float = 3;
-    DoubleSearchRequest request_double = 4;
-    StringSearchRequest request_string = 5;
-    ByteSearchRequest request_bytes = 6;
-    Int32FuzzyRequest fuzzy_int32 = 7;
-    Int64FuzzyRequest fuzzy_int64 = 8;
-    FloatFuzzyRequest fuzzy_float = 9;
-    DoubleFuzzyRequest fuzzy_double = 10;
+    Int32SearchRequest request_int32 = 2;
+    Int64SearchRequest request_int64 = 3;
+    FloatSearchRequest request_float = 4;
+    DoubleSearchRequest request_double = 5;
+    StringSearchRequest request_string = 6;
+    ByteSearchRequest request_bytes = 7;
+    Int32FuzzyRequest fuzzy_int32 = 8;
+    Int64FuzzyRequest fuzzy_int64 = 9;
+    FloatFuzzyRequest fuzzy_float = 10;
+    DoubleFuzzyRequest fuzzy_double = 11;
   }
 
   // if this variable is null a new search is performed, otherwise the
   // search will only search at addresses defined in the results list
-  repeated SearchResult results = 2;
+  repeated SearchResult results = 12;
 }
 
 service SearchService {
