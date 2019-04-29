@@ -129,7 +129,7 @@ message SearchRequest {
 
   // if this variable is null a new search is performed, otherwise the
   // search will only search at addresses defined in the results list
-  repeated SearchResult results = 12;
+  repeated SearchResult results = 20;
 }
 
 service SearchService {
