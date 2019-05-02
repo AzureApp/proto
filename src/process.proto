@@ -25,7 +25,8 @@ message Process {
   string path = 3;
   int32 process_flags = 4;  // use the ProcessType enum with this flag
 
-  // TODO: change this to a oneof? (or just define every possible additional data)
+  // TODO: change this to a oneof? (or just define every possible additional
+  // data)
   bytes additional_info = 10;  // this info can be used to encode data such as
                                // app icons if supported by the server
 }
