@@ -11,9 +11,10 @@ package azure.proto;
  * flag indicating the type of a process, can have more than one.
  */
 enum ProcessType {
-  PROC_SYSTEM = 1;     // system processes like daemons
-  PROC_BACKGROUND = 2; // background user processes
-  PROC_APP = 4;        // what an average user would call an "app"
+  PROC_ALL = 0;
+  PROC_SYSTEM = 1;      // system processes like daemons
+  PROC_BACKGROUND = 2;  // background user processes
+  PROC_APP = 4;         // what an average user would call an "app"
 }
 
 // TODO: maybe use a oneof for Process or AppProcess which contains more info
@@ -22,10 +23,11 @@ message Process {
   int32 pid = 1;
   string name = 2;
   string path = 3;
-  int32 process_flags = 4; // use the ProcessType enum with this flag
+  int32 process_flags = 4;  // use the ProcessType enum with this flag
 
-  bytes additional_info = 10; // this info can be used to encode data such as
-                              // app icons if supported by the server
+  // TODO: change this to a oneof? (or just define every possible additional data)
+  bytes additional_info = 10;  // this info can be used to encode data such as
+                               // app icons if supported by the server
 }
 
 message ProcessRequest {
@@ -38,7 +40,7 @@ message ProcessRequest {
 
 message KillRequest {
   int32 pid = 1;
-  int32 signal = 2; // defaults to SIGTERM (or equivalent for other platforms)
+  int32 signal = 2;  // defaults to SIGTERM (or equivalent for other platforms)
 }
 
 service ProcessService {

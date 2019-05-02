@@ -3,7 +3,10 @@ syntax = "proto3";
 // we don't need reflection for our use cases
 option optimize_for = LITE_RUNTIME;
 
-import "google/protobuf/empty.proto";
+// protobuf lite doesn't currently contain well known proto definitions (like
+// empty)
+// don't include for now
+// import "google/protobuf/empty.proto";
 
 package azure.proto;
 
@@ -39,18 +42,22 @@ message Handshake {
  * Message sent to poll latency between clients for testing quality of
  * connection
  */
-message Keepalive { int64 timestap = 1; }
+message Keepalive {
+  int64 timestap = 1;
+}
 
 enum DisconnectOperation {
   OP_NONE = 0;
-  OP_RESTART = 1; // restart server
-  OP_KILL = 2;    // kill server
+  OP_RESTART = 1;  // restart server
+  OP_KILL = 2;     // kill server
 }
 
-message Disconnet {
+message DisconnectRequest {
   string reason = 1;
   DisconnectOperation operation = 2;
 }
+
+message DisconnectResponse {}
 
 service ConnectionService {
   /**
@@ -63,5 +70,5 @@ service ConnectionService {
    * Disconnect from connected server.
    * This rpc should not return if a kill/restart operation is also provided
    */
-  rpc Disconnect(Disconnect) returns (google.protobuf.Empty);
+  rpc Disconnect(DisconnectRequest) returns (DisconnectResponse);
 }
