@@ -108,7 +108,7 @@ message SearchResult {
 
 /**
  * Defines the data required for a new search operation.
- * This includes the search options andthe data-type specific search info.
+ * This includes the search options and the data-type specific search info.
  * An optional "results" array of search results is provided for continuations
  * of an existing search.
  */
@@ -149,7 +149,7 @@ service SearchService {
    * Updates the values of the provided result object stream with the current
    * values of the memory locations stored in the result objects.
    * This rpc fails if the target pid is null or if any of the results now
-   * points to inaccesible/invalid memory.
+   * points to inaccessible/invalid memory.
    */
   rpc UpdateResults(stream SearchResult) returns (stream SearchResult);
 }
