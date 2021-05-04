@@ -5,6 +5,8 @@ option optimize_for = LITE_RUNTIME;
 
 package azure.proto;
 
+import "session.proto";
+
 enum MemoryFlags {
   PROT_NONE = 0;
   PROT_READ = 1;
@@ -23,7 +25,6 @@ enum MemoryZones {
  * Options used for search requests
  */
 message SearchOptions {
-  int32 target_pid = 1;   // target process
   bool fuzzy = 2;         // search is fuzzy
   int32 memory_flags = 3; // what protections to include
   int32 zone_flags = 4;   // which memory regions to search
@@ -94,7 +95,7 @@ enum ResultType {
  * data itself.
  */
 message SearchResult {
-  int64 address = 1;
+  uint64 address = 1;
   ResultType result_type = 2;
   oneof result {
     int32 result_int32 = 3;
@@ -114,6 +115,7 @@ message SearchResult {
  */
 message SearchRequest {
   SearchOptions options = 1;
+  Session session = 15;
   oneof request {
     Int32SearchRequest request_int32 = 2;
     Int64SearchRequest request_int64 = 3;

@@ -38,14 +38,6 @@ message Handshake {
   DeviceInfo device_info = 2;
 }
 
-/**
- * Message sent to poll latency between clients for testing quality of
- * connection
- */
-message Keepalive {
-  int64 timestamp = 1;
-}
-
 enum DisconnectOperation {
   OP_NONE = 0;
   OP_RESTART = 1;  // restart server
