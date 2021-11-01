@@ -1,3 +1,10 @@
+/**
+ * File: session.proto
+ * Description: Provides types and rpcs for session-related queries
+ *
+ * A session represents actions that can be performed on a single process on the server's device.
+ * A single `connection` (see connection.proto) can have multiple sessions for different processes
+ */
 syntax = "proto3";
 
 // we don't need reflection for our use cases
@@ -7,16 +14,15 @@ package azure.proto;
 
 import "google/protobuf/timestamp.proto";
 import "process.proto";
-import "search.proto";
 
-enum ConnectStatus {
+enum SessionConnectStatus {
     STATUS_CONNECTED = 0;
     STATUS_NO_PERMISSION = 1;
     STATUS_NOT_FOUND = 2;
     STATUS_INTERNAL_FAILURE = 3;
 }
 
-enum DisconnectStatus {
+enum SessionDisconnectStatus {
     STATUS_DISCONNECTED = 0;
     STATUS_COULD_NOT_DISCONNECT = 1;
 }
@@ -39,29 +45,29 @@ message Session {
 }
   
 
-message ConnectRequest {
+message SessionConnectRequest {
     Process target = 1;
 }
 
-message ConnectResponse {
-    ConnectStatus status = 1;
+message SessionConnectResponse {
+    SessionConnectStatus status = 1;
     Session session = 2;
 }
 
-message DisconnectResponse {
-    DisconnectStatus status = 1;
+message SessionDisconnectResponse {
+    SessionDisconnectStatus status = 1;
 }
 
 service SessionService {
     /**
      * Connect to a target process and establish a new session 
      */
-    rpc Connect(ConnectRequest) returns (ConnectResponse);
+    rpc Connect(SessionConnectRequest) returns (SessionConnectResponse);
     /**
      * Disconnect from and close an existing session
      * This rpc fails if the session is invalid (e.g. pprocess doesn't exist) 
      */
-    rpc Disconnect(Session) returns (DisconnectResponse);
+    rpc Disconnect(Session) returns (SessionDisconnectResponse);
 
     rpc Keepalive(KeepalivePacket) returns (KeepalivePacket);
 }

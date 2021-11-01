@@ -1,3 +1,10 @@
+/**
+ * File: connection.proto
+ * Description: Provides types and rpcs for connection-related queries
+ *
+ * A connection is one-to-one between client and server and only carries data 
+ * related to the server itself, not target processes (see session.proto)
+ */
 syntax = "proto3";
 
 // we don't need reflection for our use cases

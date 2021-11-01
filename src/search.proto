@@ -1,3 +1,9 @@
+/**
+ * File: search.proto
+ * Description: Provides types and rpcs for memory search queries
+ *
+ * Each search must provide a session object which indicates which process is being searched
+ */
 syntax = "proto3";
 
 // we don't need reflection for our use cases

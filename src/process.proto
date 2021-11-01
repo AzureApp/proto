@@ -1,3 +1,10 @@
+/**
+ * File: process.proto
+ * Description: Provides types and rpcs for process-related data
+ *
+ * Process data returned may not be valid if the process is killed before it is received
+ * RPC calls that use the Process message will fail gracefully if this is the case
+ */
 syntax = "proto3";
 
 // we don't need reflection for our use cases
